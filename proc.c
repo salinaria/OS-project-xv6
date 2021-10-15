@@ -532,3 +532,7 @@ procdump(void)
     cprintf("\n");
   }
 }
+int getProcCount(void){
+  cprintf("Helllo I'm Ali");
+  return 0;
+}
