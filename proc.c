@@ -533,6 +533,12 @@ procdump(void)
   }
 }
 int getProcCount(void){
-  cprintf("Helllo I'm Ali");
+  struct proc *p;
+  int procCount = 0;
+  for (p=ptable.proc;p<&ptable.proc[NPROC];p++){
+    if(p->state != UNUSED) procCount++;
+      }
+  cprintf("%d",procCount);
+
   return 0;
 }

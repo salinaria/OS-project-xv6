@@ -4,6 +4,6 @@
 
 int main(void){
     getProcCount();
-    printf(1,"successfull");
+    printf(1,"\nsuccessfull");
     exit();
 }
