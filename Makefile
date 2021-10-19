@@ -181,7 +181,8 @@ UPROGS=\
 	_usertests\
 	_wc\
 	_zombie\
-	_sysTest\
+	_procCount\
+	_readCount\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -254,7 +255,8 @@ EXTRA=\
 	printf.c umalloc.c\
 	README dot-bochsrc *.pl toc.* runoff runoff1 runoff.list\
 	.gdbinit.tmpl gdbutil\
-	sysTest.c\
+	procCount.c\
+	readCount.c\
 
 dist:
 	rm -rf dist
