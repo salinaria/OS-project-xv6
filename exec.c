@@ -19,6 +19,9 @@ exec(char *path, char **argv)
   pde_t *pgdir, *oldpgdir;
   struct proc *curproc = myproc();
 
+
+  curproc -> stackTop = sp;
+
   begin_op();
 
   if((ip = namei(path)) == 0){
