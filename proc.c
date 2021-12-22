@@ -211,7 +211,7 @@ growproc(int n)
       return 0;
     }else{
       for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
-        if(p!=curproc && p->parent == curproc->parent && p->threads == -1){
+        if(p->parent == curproc->parent && p->threads == -1){
           p->sz = curproc->sz;
           numberOfChildren--;
         }
@@ -317,6 +317,15 @@ exit(void)
   panic("zombie exit");
 }
 
+
+int check_pgdir_share(struct proc *process){
+  struct proc *p;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p != process && p -> pgdir == process->pgdir)return 0;
+  }
+  return 1;
+}
+
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 int
@@ -339,7 +348,8 @@ wait(void)
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
-        freevm(p->pgdir);
+
+        if(check_pgdir_share(p)==1)freevm(p->pgdir);
         p->pid = 0;
         p->parent = 0;
         p->name[0] = 0;
@@ -598,13 +608,6 @@ int getReadCount(void){
   return 0;
 }
 
-int check_pgdir_share(struct proc *process){
-  struct proc *p;
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-    if(p != process && p -> pgdir == process->pgdir)return 0;
-  }
-  return 1;
-}
 
 int thread_create(void *stack){
   

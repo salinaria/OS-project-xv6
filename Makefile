@@ -185,6 +185,7 @@ UPROGS=\
 	_zombie\
 	_procCount\
 	_readCount\
+	_threads\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -259,6 +260,7 @@ EXTRA=\
 	.gdbinit.tmpl gdbutil\
 	procCount.c\
 	readCount.c\
+	threads.c\
 
 dist:
 	rm -rf dist
