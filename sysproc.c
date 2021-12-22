@@ -99,3 +99,17 @@ int
 sys_getReadCount(void){
   return getReadCount();
 }
+
+int 
+sys_thread_create(void){
+  void* p;
+  if(argptr(0,(void*)&p,sizeof(*p))<0){
+    return -1;
+  }
+  return thread_create(p);
+}
+
+int 
+sys_thread_wait(void){
+  return thread_wait();
+}

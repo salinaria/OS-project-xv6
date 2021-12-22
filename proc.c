@@ -172,17 +172,56 @@ growproc(int n)
 
   sz = curproc->sz;
   if(n > 0){
-    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0)
+    if((sz = allocuvm(curproc->pgdir, sz, sz + n)) == 0){
       release(&thread);
       return -1;
+    }
   } else if(n < 0){
-    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0)
+    if((sz = deallocuvm(curproc->pgdir, sz, sz + n)) == 0){
       release(&thread);
       return -1;
+    }
   }
   curproc->sz = sz;
+  acquire(&ptable.lock);
+  struct proc *p;
+  int numberOfChildren;
+  if(curproc->threads == -1){
+    curproc->parent->sz =curproc->sz;
+    numberOfChildren = curproc->parent->threads-2;
+    if(numberOfChildren<=0){
+      release(&ptable.lock);
+      release(&thread);
+      switchuvm(curproc);
+      return 0;
+    }else{
+      for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
+        if(p!=curproc && p->parent == curproc->parent && p->threads == -1){
+          p->sz = curproc->sz;
+          numberOfChildren--;
+        }
+      }
+    }
+  }else{
+    numberOfChildren = curproc->threads -1;
+    if(numberOfChildren<=0){
+      release(&ptable.lock);
+      release(&thread);
+      switchuvm(curproc);
+      return 0;
+    }else{
+      for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
+        if(p!=curproc && p->parent == curproc->parent && p->threads == -1){
+          p->sz = curproc->sz;
+          numberOfChildren--;
+        }
+      }
+    }
+  }
+  release(&ptable.lock);
+  release(&thread);
   switchuvm(curproc);
-  return 0;
+  return 0;   
 }
 
 // Create a new process copying p as the parent.
@@ -646,6 +685,7 @@ int thread_wait(void){
         return pid;
       }
     }
+  }
 
     // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){

@@ -25,6 +25,8 @@ int sleep(int);
 int uptime(void);
 int getProcCount(void);
 int getReadCount(void);
+int thread_create(void*);
+int thread_wait(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
@@ -39,3 +41,4 @@ void* memset(void*, int, uint);
 void* malloc(uint);
 void free(void*);
 int atoi(const char*);
+int thread_creator(void (*fn) (void*), void *arg);

@@ -144,6 +144,8 @@ vectors.S: vectors.pl
 	./vectors.pl > vectors.S
 
 ULIB = ulib.o usys.o printf.o umalloc.o
+ULIB = ulib.o usys.o printf.o umalloc.o thread_creator.o
+
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
