@@ -19,6 +19,7 @@ int thread_creator(void(*fn) (void*),void *arg){
 
     if(thread_id<0) printf(1,"thread_create failed\n");
     else if(thread_id == 0){
+        (fn)(arg);
         free(stack);
         exit();
     }

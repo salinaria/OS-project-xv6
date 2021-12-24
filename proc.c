@@ -94,7 +94,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->stackTop = -1;
-  p->threads = -1;
+  p->threads = 1;
 
   release(&ptable.lock);
 
@@ -211,7 +211,7 @@ growproc(int n)
       return 0;
     }else{
       for(p=ptable.proc;p<&ptable.proc[NPROC];p++){
-        if(p->parent == curproc->parent && p->threads == -1){
+        if(p->parent == curproc && p->threads == -1){
           p->sz = curproc->sz;
           numberOfChildren--;
         }
@@ -342,6 +342,7 @@ wait(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->parent != curproc)
         continue;
+      if(p->threads==-1)continue;
       havekids = 1;
       if(p->state == ZOMBIE){
         // Found one.
@@ -354,6 +355,9 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        p->threads = 0;
+        p->stackTop = -1;
+        p->pgdir = 0;
         p->state = UNUSED;
         release(&ptable.lock);
         return pid;
@@ -620,7 +624,8 @@ int thread_create(void *stack){
 
   curproc -> threads++;
   np-> stackTop = (int)((char*)stack + PGSIZE);
-  
+  np->threads = -1;
+
   acquire(&ptable.lock);
   np -> pgdir = curproc -> pgdir;
   np -> sz = curproc -> sz;
@@ -678,21 +683,24 @@ int thread_wait(void){
         pid = p->pid;
         kfree(p->kstack);
         p->kstack = 0;
-        freevm(p->pgdir);
+        if(check_pgdir_share(p))freevm(p->pgdir);
         p->pid = 0;
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        p->threads = 0;
+        p->stackTop = -1;
+        p->pgdir = 0;
         p->state = UNUSED;
         release(&ptable.lock);
         return pid;
       }
     }
-  }
 
-    // No point waiting if we don't have any children.
     if(!havekids || curproc->killed){
       release(&ptable.lock);
       return -1;
     }
+    sleep(curproc, &ptable.lock);
+  }
 }

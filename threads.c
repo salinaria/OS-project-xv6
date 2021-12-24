@@ -7,7 +7,6 @@ int x=0;
 
 int main(int argc, char *argv[]) {
 
-    // int tid = fork();
     int tid = thread_create(stack);
 
     if(tid < 0) {
