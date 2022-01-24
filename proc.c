@@ -95,6 +95,8 @@ found:
   p->pid = nextpid++;
   p->stackTop = -1;
   p->threads = 1;
+  p->clocksPassed=0;
+  p->creationTime=ticks;
 
   release(&ptable.lock);
 
@@ -406,7 +408,7 @@ scheduler(void)
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
-
+      p->clocksPassed=0;
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
@@ -418,6 +420,20 @@ scheduler(void)
 
   }
 }
+
+
+int 
+clocksTicked(void){
+  int ans;
+  acquire(&ptable.lock);
+  struct proc *tmp;
+  tmp=myproc();
+  tmp->clocksPassed=tmp->clocksPassed+1;
+  ans=tmp->clocksPassed;
+  release(&ptable.lock);
+  return ans;
+}
+
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
