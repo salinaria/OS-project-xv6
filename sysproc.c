@@ -29,6 +29,21 @@ sys_wait(void)
 }
 
 int
+sys_changePolicy(void)
+{
+  int policy;
+  argint(0, &policy);
+  changePolicy(policy);
+  return 1;
+}
+
+int
+sys_getPolicy(void)
+{
+  return getPolicy();
+}
+
+int
 sys_wait2(void)
 {
   int* runningTime;

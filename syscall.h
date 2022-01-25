@@ -25,3 +25,5 @@
 #define SYS_thread_create 24
 #define SYS_thread_wait 25
 #define SYS_wait2  26
+#define SYS_changePolicy 27
+#define SYS_getPolicy 28
