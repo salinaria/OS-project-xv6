@@ -29,6 +29,22 @@ sys_wait(void)
 }
 
 int
+sys_wait2(void)
+{
+  int* runningTime;
+  int* sleepingTime;
+  int* terminationTime;
+  int* creationTime;
+  int* readyTime;
+  argptr(0, (char**)&runningTime ,sizeof(int));
+  argptr(1, (char**)&sleepingTime , sizeof(int));
+  argptr(2, (char**)&terminationTime , sizeof(int));
+  argptr(3, (char**)&creationTime , sizeof(int));
+  argptr(4, (char**)&readyTime , sizeof(int));
+  return wait2(runningTime,sleepingTime,terminationTime,creationTime,readyTime);
+}
+
+int
 sys_kill(void)
 {
   int pid;

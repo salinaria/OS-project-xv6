@@ -15,6 +15,7 @@ struct spinlock tickslock;
 uint ticks;
 
 extern int clocksTicked(void);
+extern void updateInformations(void);
 
 void
 tvinit(void)
@@ -52,6 +53,7 @@ trap(struct trapframe *tf)
   case T_IRQ0 + IRQ_TIMER:
     if(cpuid() == 0){
       acquire(&tickslock);
+      updateInformations();
       ticks++;
       wakeup(&ticks);
       release(&tickslock);

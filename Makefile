@@ -187,6 +187,7 @@ UPROGS=\
 	_readCount\
 	_threads\
 	_threadtest\
+	_roundRobinTest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -263,6 +264,7 @@ EXTRA=\
 	readCount.c\
 	threads.c\
 	threadtest.c\
+	roundRobinTest.c\
 
 dist:
 	rm -rf dist

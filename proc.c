@@ -315,6 +315,7 @@ exit(void)
 
   // Jump into the scheduler, never to return.
   curproc->state = ZOMBIE;
+  curproc->terminationTime=ticks;
   sched();
   panic("zombie exit");
 }
@@ -377,6 +378,60 @@ wait(void)
   }
 }
 
+
+int wait2(int* runningTime , int* sleepingTime , int* terminationTime , int* creationTime , int* readyTime){
+  struct proc *p;
+  int havekids, pid;
+  struct proc *curproc = myproc();
+  
+  acquire(&ptable.lock);
+  for(;;){
+    // Scan through table looking for exited children.
+    havekids = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->parent != curproc)
+        continue;
+      if(p->threads==-1)continue;
+      havekids = 1;
+      if(p->state == ZOMBIE){
+        // Found one.
+
+        *runningTime=p->runningTime;
+        *sleepingTime=p->sleepingTime;
+        *terminationTime=p->terminationTime;
+        *creationTime=p->creationTime;
+        *readyTime=p->readyTime;
+
+        pid = p->pid;
+        kfree(p->kstack);
+        p->kstack = 0;
+
+        if(check_pgdir_share(p)==1)freevm(p->pgdir);
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+        p->threads = 0;
+        p->stackTop = -1;
+        p->pgdir = 0;
+        p->state = UNUSED;
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || curproc->killed){
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
+  
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -419,6 +474,22 @@ scheduler(void)
     release(&ptable.lock);
 
   }
+}
+
+void
+updateInformations(void){
+  struct proc *p;
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state==RUNNABLE){
+      p->readyTime++;
+    }else if(p->state==SLEEPING){
+      p->sleepingTime++;
+    }else if(p->state==RUNNING){
+      p->runningTime++;
+    }
+  }
+  release(&ptable.lock);
 }
 
 
