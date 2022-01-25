@@ -30,7 +30,7 @@ int main(void){
             printf(1,"\nPID : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],waitingTime,burstTime,turnaroundTime);
         }
     }else{
-        for (int i=1; i<=100; i++) {
+        for (int i=1; i<=1000; i++) {
             printf(1, "/%d/ : /%d/ \n", getpid(), i);
             sleep(10);
         }

@@ -40,7 +40,7 @@ int main(void){
             printf(1,"\nPID : %d | Priority : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priority,waitingTime,burstTime,turnaroundTime);
         }
     }else{
-        for (int i=1; i<=10; i++) {
+        for (int i=1; i<=250; i++) {
             printf(1, "/%d/ : /%d/ \n", childNumber, i);
             sleep(10);
         }
