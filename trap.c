@@ -114,7 +114,7 @@ trap(struct trapframe *tf)
      tf->trapno == T_IRQ0+IRQ_TIMER ){
        if(getPolicy()==1){
          yield();
-       }else if(getPolicy()==2 && clocksTicked()==QUANTOM){
+       }else if(getPolicy()!=1 && clocksTicked()==QUANTOM){
          yield();
        }
      }

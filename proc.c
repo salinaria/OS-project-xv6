@@ -98,6 +98,8 @@ found:
   p->stackTop = -1;
   p->threads = 1;
   p->clocksPassed=0;
+  p->priority=3;
+  p->lastUsed=0;
   p->creationTime=ticks;
 
   release(&ptable.lock);
@@ -385,6 +387,19 @@ int changePolicy(int policy){
   return 1;
 }
 
+int setPriority(int priority){
+  int finalAns=priority;
+  if(priority>6 || priority<1){
+    finalAns=5;
+  }
+  acquire(&ptable.lock);
+  struct proc *tmp;
+  tmp=myproc();
+  tmp->priority=finalAns;
+  release(&ptable.lock);
+  return 1;
+}
+
 int getPolicy(){
   return policyForScheduling;
 }
@@ -462,27 +477,90 @@ scheduler(void)
     // Enable interrupts on this processor.
     sti();
 
-    // Loop over process table looking for process to run.
-    acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
+    // Default Or Round-Robin
+    if(policyForScheduling==1 || policyForScheduling==2){
+      acquire(&ptable.lock);
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
-      p->clocksPassed=0;
-      swtch(&(c->scheduler), p->context);
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+        p->clocksPassed=0;
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      }
+      release(&ptable.lock);
+    
+    // Priority 
+    }else if(policyForScheduling==3){
+      acquire(&ptable.lock);
+      struct proc* bestPriorities[100];
+      int index_best_priorities=0;
+      int best_priority_found=6;
+
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
+        if(p->priority < best_priority_found){
+          index_best_priorities=0;
+          best_priority_found=p->priority;
+          bestPriorities[index_best_priorities]=p;
+          index_best_priorities++;
+        }else if(p->priority==best_priority_found){
+          bestPriorities[index_best_priorities]=p;
+          index_best_priorities++;
+        }else{
+          continue;
+        }
+      }
+
+      if(index_best_priorities<=0){
+        release(&ptable.lock);
+        continue;
+      }
+      int ii;
+      struct proc* chosen=bestPriorities[0];
+      for(ii=0;ii<index_best_priorities;ii++){
+        if(bestPriorities[ii]->lastUsed==0){
+          bestPriorities[ii]->lastUsed=(bestPriorities[ii]->lastUsed+1)%index_best_priorities;
+          chosen=bestPriorities[ii];
+          int jj;
+          for(jj=0;jj<index_best_priorities;jj++){
+            if(bestPriorities[jj]->lastUsed!=0 && ii!=jj){
+              bestPriorities[jj]->lastUsed=(bestPriorities[jj]->lastUsed+1)%index_best_priorities;
+            }
+          }
+          break;
+        }
+      }
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+      c->proc = chosen;
+      switchuvm(chosen);
+      chosen->state = RUNNING;
+      chosen->clocksPassed=0;
+      swtch(&(c->scheduler), chosen->context);
       switchkvm();
 
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+      release(&ptable.lock);
+      
+    // MultiLayeredQueued Non Preemptive
+    }else if(policyForScheduling==4){
+
     }
-    release(&ptable.lock);
 
   }
 }
