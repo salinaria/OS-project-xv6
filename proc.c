@@ -400,6 +400,18 @@ int setPriority(int priority){
   return 1;
 }
 
+int decreasePriority(){
+  acquire(&ptable.lock);
+  struct proc *tmp;
+  tmp=myproc();
+  if(tmp->priority>1){
+    tmp->priority--;
+  }
+  release(&ptable.lock);
+  return 1;
+}
+
+
 int isThereBetterProcess(){
   int isThere=0;
   struct proc *p;
@@ -801,8 +813,12 @@ wakeup1(void *chan)
   struct proc *p;
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
+    if(p->state == SLEEPING && p->chan == chan){
+      if(policyForScheduling==5){
+        p->priority=1;
+      }
       p->state = RUNNABLE;
+    }
 }
 
 // Wake up all processes sleeping on chan.

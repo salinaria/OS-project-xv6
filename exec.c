@@ -18,7 +18,9 @@ exec(char *path, char **argv)
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
   struct proc *curproc = myproc();
-
+  if(getPolicy()==5){
+    curproc->priority=3;
+  }
 
 
   begin_op();

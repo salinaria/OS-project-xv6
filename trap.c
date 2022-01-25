@@ -20,7 +20,7 @@ extern void updateInformations(void);
 extern int getPolicy();
 extern int getQuantom();
 extern int isThereBetterProcess();
-
+extern int decreasePriority();
 
 void
 tvinit(void)
@@ -116,6 +116,8 @@ trap(struct trapframe *tf)
      tf->trapno == T_IRQ0+IRQ_TIMER ){
        if(getPolicy()==4 && isThereBetterProcess()==1){
          yield();
+       }else if(getPolicy()==5 && isThereBetterProcess()==1){
+         yield();
        }else if(getPolicy()==1){
          yield();
        }else if(getPolicy()==2 && clocksTicked()==QUANTOM){
@@ -123,6 +125,9 @@ trap(struct trapframe *tf)
        }else if(getPolicy()==3 && clocksTicked()==QUANTOM){
          yield();
        }else if(getPolicy()==4 && clocksTicked()==getQuantom()){
+         yield();
+       }else if(getPolicy()==5 && clocksTicked()==getQuantom()){
+         decreasePriority();
          yield();
        }
      }
