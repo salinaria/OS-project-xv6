@@ -12,4 +12,10 @@
 #define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
 #define FSSIZE       1000  // size of file system in blocks
 #define QUANTOM      10
+#define QUANTOM1     20
+#define QUANTOM2     18
+#define QUANTOM3     16
+#define QUANTOM4     14
+#define QUANTOM5     12
+#define QUANTOM6     10
 

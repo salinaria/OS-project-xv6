@@ -400,6 +400,58 @@ int setPriority(int priority){
   return 1;
 }
 
+int isThereBetterProcess(){
+  int isThere=0;
+  struct proc *p;
+  struct proc *myprocess;
+  acquire(&ptable.lock);
+  myprocess=myproc();
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state!=RUNNABLE)
+        continue;
+      
+      if(p->priority < myprocess->priority){
+        isThere=1;
+        break;
+      }
+  }
+  release(&ptable.lock);
+  return isThere;
+}
+
+int getQuantom(void){
+  int ans=1;
+  acquire(&ptable.lock);
+  struct proc *tmp;
+  tmp=myproc();
+  int priority=tmp->priority;
+  if(priority==1){
+    ans=QUANTOM1;
+  }else if(priority==2){
+    ans=QUANTOM2;
+  }else if(priority==3){
+    ans=QUANTOM3;
+  }else if(priority==4){
+    ans=QUANTOM4;
+  }else if(priority==5){
+    ans=QUANTOM5;
+  }else if(priority==6){
+    ans=QUANTOM6;
+  }
+  release(&ptable.lock);
+  return ans;
+}
+
+int getPriority(void){
+  int ans;
+  acquire(&ptable.lock);
+  struct proc *tmp;
+  tmp=myproc();
+  ans=tmp->priority;
+  release(&ptable.lock);
+  return ans;
+}
+
 int getPolicy(){
   return policyForScheduling;
 }
@@ -554,8 +606,8 @@ scheduler(void)
       }
       release(&ptable.lock);
     
-    // Priority 
-    }else if(policyForScheduling==3){
+    // Priority Or MultiLayeredQueued Non Preemptive
+    }else if(policyForScheduling==3 || policyForScheduling==4){
       acquire(&ptable.lock);
       struct proc* bestPriorities[100];
       int index_best_priorities=0;
@@ -604,8 +656,8 @@ scheduler(void)
       c->proc = 0;
       release(&ptable.lock);
       
-    // MultiLayeredQueued Non Preemptive
-    }else if(policyForScheduling==4){
+    // Dynamic MultiLayeredQueued Non Preemptive
+    }else if(policyForScheduling==5){
 
     }
 
@@ -640,6 +692,8 @@ clocksTicked(void){
   release(&ptable.lock);
   return ans;
 }
+
+
 
 
 // Enter scheduler.  Must hold only ptable.lock

@@ -12,9 +12,9 @@ int main(void){
     int waitingTimeAverage=0;
     int burstTimeAverage=0;
     int turnaroundTimeAverage=0;
-    int waitingArrayAverage[7];
-    int burstArrayAverage[7];
-    int turnaroundArrayAverage[7];
+    int waitingArrayAverage[7]={0};
+    int burstArrayAverage[7]={0};
+    int turnaroundArrayAverage[7]={0};
     for(int i=0;i<30;i++){
         if(getpid()==father){
             fork();

@@ -18,6 +18,8 @@ uint ticks;
 extern int clocksTicked(void);
 extern void updateInformations(void);
 extern int getPolicy();
+extern int getQuantom();
+extern int isThereBetterProcess();
 
 
 void
@@ -112,9 +114,15 @@ trap(struct trapframe *tf)
   
   if(myproc() && myproc()->state == RUNNING &&
      tf->trapno == T_IRQ0+IRQ_TIMER ){
-       if(getPolicy()==1){
+       if(getPolicy()==4 && isThereBetterProcess()==1){
          yield();
-       }else if(getPolicy()!=1 && clocksTicked()==QUANTOM){
+       }else if(getPolicy()==1){
+         yield();
+       }else if(getPolicy()==2 && clocksTicked()==QUANTOM){
+         yield();
+       }else if(getPolicy()==3 && clocksTicked()==QUANTOM){
+         yield();
+       }else if(getPolicy()==4 && clocksTicked()==getQuantom()){
          yield();
        }
      }
