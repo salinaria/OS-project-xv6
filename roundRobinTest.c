@@ -19,7 +19,6 @@ int main(void){
     }
     if(getpid()==father){
         for(int i=0;i<10;i++){
-            wait();
             pids[i]=wait2(&runningTime,&sleepingTime,&terminationTime,&creationTime,&readyTime);
             int waitingTime=sleepingTime+readyTime;
             int burstTime=runningTime;

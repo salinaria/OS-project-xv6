@@ -110,6 +110,8 @@ extern int sys_thread_wait(void);
 extern int sys_wait2(void);
 extern int sys_changePolicy(void);
 extern int sys_getPolicy(void);
+extern int sys_setPriority(void);
+extern int sys_wait3(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -140,6 +142,8 @@ static int (*syscalls[])(void) = {
 [SYS_wait2]          sys_wait2,
 [SYS_changePolicy]   sys_changePolicy,
 [SYS_getPolicy]      sys_getPolicy,
+[SYS_setPriority]    sys_setPriority,
+[SYS_wait3]          sys_wait3,
 };
 
 void

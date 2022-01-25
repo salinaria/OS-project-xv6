@@ -27,3 +27,5 @@
 #define SYS_wait2  26
 #define SYS_changePolicy 27
 #define SYS_getPolicy 28
+#define SYS_setPriority 29
+#define SYS_wait3 30

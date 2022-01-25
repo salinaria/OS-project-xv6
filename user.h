@@ -30,6 +30,8 @@ int thread_wait(void);
 int wait2(int*,int*,int*,int*,int*);
 int changePolicy(int);
 int getPolicy(void);
+int setPriority(int);
+int wait3(int*,int*,int*,int*,int*,int*);
 
 // ulib.c
 int stat(const char*, struct stat*);

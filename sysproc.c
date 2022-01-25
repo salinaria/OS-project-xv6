@@ -38,6 +38,15 @@ sys_changePolicy(void)
 }
 
 int
+sys_setPriority(void)
+{
+  int priority;
+  argint(0, &priority);
+  setPriority(priority);
+  return 1;
+}
+
+int
 sys_getPolicy(void)
 {
   return getPolicy();
@@ -58,6 +67,25 @@ sys_wait2(void)
   argptr(4, (char**)&readyTime , sizeof(int));
   return wait2(runningTime,sleepingTime,terminationTime,creationTime,readyTime);
 }
+
+int
+sys_wait3(void)
+{
+  int* priority;
+  int* runningTime;
+  int* sleepingTime;
+  int* terminationTime;
+  int* creationTime;
+  int* readyTime;
+  argptr(0, (char**)&priority ,sizeof(int));
+  argptr(1, (char**)&runningTime ,sizeof(int));
+  argptr(2, (char**)&sleepingTime , sizeof(int));
+  argptr(3, (char**)&terminationTime , sizeof(int));
+  argptr(4, (char**)&creationTime , sizeof(int));
+  argptr(5, (char**)&readyTime , sizeof(int));
+  return wait3(priority,runningTime,sleepingTime,terminationTime,creationTime,readyTime);
+}
+
 
 int
 sys_kill(void)

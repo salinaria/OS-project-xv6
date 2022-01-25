@@ -99,7 +99,7 @@ found:
   p->threads = 1;
   p->clocksPassed=0;
   p->priority=3;
-  p->lastUsed=0;
+  p->lastTimeSelected=ticks;
   p->creationTime=ticks;
 
   release(&ptable.lock);
@@ -458,6 +458,60 @@ int wait2(int* runningTime , int* sleepingTime , int* terminationTime , int* cre
   
 }
 
+int wait3(int* priority,int* runningTime , int* sleepingTime , int* terminationTime , int* creationTime , int* readyTime){
+  struct proc *p;
+  int havekids, pid;
+  struct proc *curproc = myproc();
+  
+  acquire(&ptable.lock);
+  for(;;){
+    // Scan through table looking for exited children.
+    havekids = 0;
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->parent != curproc)
+        continue;
+      if(p->threads==-1)continue;
+      havekids = 1;
+      if(p->state == ZOMBIE){
+        // Found one.
+
+        *runningTime=p->runningTime;
+        *sleepingTime=p->sleepingTime;
+        *terminationTime=p->terminationTime;
+        *creationTime=p->creationTime;
+        *readyTime=p->readyTime;
+        *priority=p->priority;
+
+        pid = p->pid;
+        kfree(p->kstack);
+        p->kstack = 0;
+
+        if(check_pgdir_share(p)==1)freevm(p->pgdir);
+        p->pid = 0;
+        p->parent = 0;
+        p->name[0] = 0;
+        p->killed = 0;
+        p->threads = 0;
+        p->stackTop = -1;
+        p->pgdir = 0;
+        p->state = UNUSED;
+        release(&ptable.lock);
+        return pid;
+      }
+    }
+
+    // No point waiting if we don't have any children.
+    if(!havekids || curproc->killed){
+      release(&ptable.lock);
+      return -1;
+    }
+
+    // Wait for children to exit.  (See wakeup1 call in proc_exit.)
+    sleep(curproc, &ptable.lock);  //DOC: wait-sleep
+  }
+  
+}
+
 //PAGEBREAK: 42
 // Per-CPU process scheduler.
 // Each CPU calls scheduler() after setting itself up.
@@ -530,18 +584,11 @@ scheduler(void)
       int ii;
       struct proc* chosen=bestPriorities[0];
       for(ii=0;ii<index_best_priorities;ii++){
-        if(bestPriorities[ii]->lastUsed==0){
-          bestPriorities[ii]->lastUsed=(bestPriorities[ii]->lastUsed+1)%index_best_priorities;
+        if(bestPriorities[ii]->lastTimeSelected < chosen->lastTimeSelected){
           chosen=bestPriorities[ii];
-          int jj;
-          for(jj=0;jj<index_best_priorities;jj++){
-            if(bestPriorities[jj]->lastUsed!=0 && ii!=jj){
-              bestPriorities[jj]->lastUsed=(bestPriorities[jj]->lastUsed+1)%index_best_priorities;
-            }
-          }
-          break;
         }
       }
+      chosen->lastTimeSelected=ticks;
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.

@@ -188,6 +188,7 @@ UPROGS=\
 	_threads\
 	_threadtest\
 	_roundRobinTest\
+	_priorityTest\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -265,6 +266,7 @@ EXTRA=\
 	threads.c\
 	threadtest.c\
 	roundRobinTest.c\
+	priorityTest.c\
 
 dist:
 	rm -rf dist

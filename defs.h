@@ -127,6 +127,8 @@ int             thread_wait(void);
 int             wait2(int* runningTime , int* sleepingTime , int* terminationTime , int* creationTime , int* readyTime);
 int             changePolicy(int policy);
 int             getPolicy();
+int             setPriority(int priority);
+int             wait3(int* priority,int* runningTime , int* sleepingTime , int* terminationTime , int* creationTime , int* readyTime);
 
 
 // swtch.S
