@@ -404,8 +404,8 @@ int decreasePriority(){
   acquire(&ptable.lock);
   struct proc *tmp;
   tmp=myproc();
-  if(tmp->priority>1){
-    tmp->priority--;
+  if(tmp->priority<6){
+    tmp->priority=tmp->priority+1;
   }
   release(&ptable.lock);
   return 1;
@@ -618,8 +618,8 @@ scheduler(void)
       }
       release(&ptable.lock);
     
-    // Priority Or MultiLayeredQueued Non Preemptive
-    }else if(policyForScheduling==3 || policyForScheduling==4){
+    // Priority Or MultiLayeredQueued Non Preemptive Or Dynamic MultiLayeredQueued Non Preemptive
+    }else if(policyForScheduling==3 || policyForScheduling==4 || policyForScheduling==5){
       acquire(&ptable.lock);
       struct proc* bestPriorities[100];
       int index_best_priorities=0;
@@ -668,9 +668,6 @@ scheduler(void)
       c->proc = 0;
       release(&ptable.lock);
       
-    // Dynamic MultiLayeredQueued Non Preemptive
-    }else if(policyForScheduling==5){
-
     }
 
   }
