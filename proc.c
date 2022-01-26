@@ -618,7 +618,7 @@ scheduler(void)
       }
       release(&ptable.lock);
     
-    // Priority Or MultiLayeredQueued Non Preemptive Or Dynamic MultiLayeredQueued Non Preemptive
+    // Priority Or MultiLayeredQueued Preemptive Or Dynamic MultiLayeredQueued Preemptive
     }else if(policyForScheduling==3 || policyForScheduling==4 || policyForScheduling==5){
       acquire(&ptable.lock);
       struct proc* bestPriorities[100];
