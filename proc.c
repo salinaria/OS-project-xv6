@@ -840,8 +840,12 @@ kill(int pid)
     if(p->pid == pid){
       p->killed = 1;
       // Wake process from sleep if necessary.
-      if(p->state == SLEEPING)
+      if(p->state == SLEEPING){
+        if(policyForScheduling==5){
+          p->priority=1;
+        }
         p->state = RUNNABLE;
+      }
       release(&ptable.lock);
       return 0;
     }

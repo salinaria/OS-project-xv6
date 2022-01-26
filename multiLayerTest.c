@@ -4,12 +4,16 @@
 
 
 int main(void){
-    int mode=1;
+    int mode=0;
     if(mode==0){
         changePolicy(4);
         int childNumber=0;
         int father=getpid();
         int pids[60]={0};
+        int waitings[60];
+        int bursts[60];
+        int turnarounds[60];
+        int priorities[60];
         int priority,runningTime,sleepingTime,terminationTime,creationTime,readyTime;
         int waitingTimeAverage=0;
         int burstTimeAverage=0;
@@ -32,23 +36,28 @@ int main(void){
                 int waitingTime=sleepingTime+readyTime;
                 int burstTime=runningTime;
                 int turnaroundTime=waitingTime+burstTime;
+                waitings[i]=waitingTime;
+                bursts[i]=burstTime;
+                turnarounds[i]=waitingTime+burstTime;
+                priorities[i]=priority;
                 waitingTimeAverage+=waitingTime;
                 burstTimeAverage+=burstTime;
                 turnaroundTimeAverage+=turnaroundTime;
                 waitingArrayAverage[priority]+=waitingTime;
                 burstArrayAverage[priority]+=burstTime;
                 turnaroundArrayAverage[priority]+=turnaroundTime;
-                sleep(50);
-                printf(1,"\nPID : %d | Layer : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priority,waitingTime,burstTime,turnaroundTime);
+                
             }
         }else{
-            for (int i=1; i<=20; i++) {
+            for (int i=1; i<=200; i++) {
                 printf(1, "/%d/ : /%d/ \n", childNumber, i);
-                sleep(10);
+                // sleep(10);
             }
             exit();
         }
-        
+        for(int i=0;i<60;i++){
+            printf(1,"\nPID : %d | Layer : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priorities[i],waitings[i],bursts[i],turnarounds[i]);
+        }
         waitingTimeAverage/=60;
         burstTimeAverage/=60;
         turnaroundTimeAverage/=60;
@@ -65,7 +74,7 @@ int main(void){
         printf(1,"\nTotal Results : \n");
         printf(1,"\nAverage Waiting Time : %d",waitingTimeAverage);
         printf(1,"\nAverage CBT : %d",burstTimeAverage);
-        printf(1,"\nAverage Turnaround Time : %d",turnaroundTimeAverage);
+        printf(1,"\nAverage Turnaround Time : %d\n",turnaroundTimeAverage);
         
         exit();
     }else{
@@ -73,6 +82,10 @@ int main(void){
         int childNumber=0;
         int father=getpid();
         int pids[60]={0};
+        int waitings[60];
+        int bursts[60];
+        int turnarounds[60];
+        int priorities[60];
         int priority,runningTime,sleepingTime,terminationTime,creationTime,readyTime;
         int waitingTimeAverage=0;
         int burstTimeAverage=0;
@@ -94,23 +107,31 @@ int main(void){
                 int waitingTime=sleepingTime+readyTime;
                 int burstTime=runningTime;
                 int turnaroundTime=waitingTime+burstTime;
+                waitings[i]=waitingTime;
+                bursts[i]=burstTime;
+                turnarounds[i]=waitingTime+burstTime;
+                priorities[i]=priority;
                 waitingTimeAverage+=waitingTime;
                 burstTimeAverage+=burstTime;
                 turnaroundTimeAverage+=turnaroundTime;
                 waitingArrayAverage[priority]+=waitingTime;
                 burstArrayAverage[priority]+=burstTime;
                 turnaroundArrayAverage[priority]+=turnaroundTime;
-                sleep(50);
-                printf(1,"\nPID : %d | Layer : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priority,waitingTime,burstTime,turnaroundTime);
+                
+                
             }
         }else{
-            for (int i=1; i<=20; i++) {
+            for (int i=1; i<=200; i++) {
                 printf(1, "/%d/ : /%d/ \n", childNumber, i);
-                sleep(10);
+                // sleep(10);
             }
             exit();
         }
         
+
+        for(int i=0;i<60;i++){
+            printf(1,"\nPID : %d | Layer : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priorities[i],waitings[i],bursts[i],turnarounds[i]);
+        }
         waitingTimeAverage/=60;
         burstTimeAverage/=60;
         turnaroundTimeAverage/=60;
@@ -127,7 +148,7 @@ int main(void){
         printf(1,"\nTotal Results : \n");
         printf(1,"\nAverage Waiting Time : %d",waitingTimeAverage);
         printf(1,"\nAverage CBT : %d",burstTimeAverage);
-        printf(1,"\nAverage Turnaround Time : %d",turnaroundTimeAverage);
+        printf(1,"\nAverage Turnaround Time : %d\n",turnaroundTimeAverage);
         
         exit();
     }

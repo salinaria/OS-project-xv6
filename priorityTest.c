@@ -8,6 +8,10 @@ int main(void){
     int childNumber=0;
     int father=getpid();
     int pids[30]={0};
+    int waitings[30];
+    int bursts[30];
+    int turnarounds[30];
+    int priorities[30];
     int priority,runningTime,sleepingTime,terminationTime,creationTime,readyTime;
     int waitingTimeAverage=0;
     int burstTimeAverage=0;
@@ -30,23 +34,28 @@ int main(void){
             int waitingTime=sleepingTime+readyTime;
             int burstTime=runningTime;
             int turnaroundTime=waitingTime+burstTime;
+            waitings[i]=waitingTime;
+            bursts[i]=burstTime;
+            turnarounds[i]=waitingTime+burstTime;
+            priorities[i]=priority;
             waitingTimeAverage+=waitingTime;
             burstTimeAverage+=burstTime;
             turnaroundTimeAverage+=turnaroundTime;
             waitingArrayAverage[priority]+=waitingTime;
             burstArrayAverage[priority]+=burstTime;
             turnaroundArrayAverage[priority]+=turnaroundTime;
-            sleep(50);
-            printf(1,"\nPID : %d | Priority : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priority,waitingTime,burstTime,turnaroundTime);
         }
     }else{
         for (int i=1; i<=250; i++) {
             printf(1, "/%d/ : /%d/ \n", childNumber, i);
-            sleep(10);
+            // sleep(10);
         }
         exit();
     }
     
+    for(int i=0;i<30;i++){
+        printf(1,"\nPID : %d | Priority : %d | Waiting : %d | CBT : %d | Turnaround : %d ",pids[i],priorities[i],waitings[i],bursts[i],turnarounds[i]);
+    }
     waitingTimeAverage/=30;
     burstTimeAverage/=30;
     turnaroundTimeAverage/=30;
